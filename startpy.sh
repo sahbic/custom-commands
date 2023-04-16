@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# get this script directory
+DIR=$(dirname "$0")
+
 # Create a new Python project
 mkdir $1
 cd $1
@@ -26,7 +29,7 @@ touch .env
 touch .env.example
 
 # copy .gitignore.template to .gitignore
-cp ../templates/.gitignore.template .gitignore
+cp $DIR/templates/.gitignore.template .gitignore
 
 # add project name to README.md
 echo "# $1" >> README.md
