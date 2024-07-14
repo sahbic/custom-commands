@@ -11,6 +11,8 @@ if [ -f "startpy.sh" ]; then
 
     # add execution rights to all .sh files in parent directory
     chmod +x $DIR/*.sh
+    # add execution rights to all .py files in parent directory
+    chmod +x $DIR/*.py
 
     # print directory
     echo "Directory: $DIR"
@@ -32,6 +34,18 @@ if [ -f "startpy.sh" ]; then
             # check if alias already exists
             if ! grep -q "alias $filename=" ~/.bashrc; then
                 echo "alias $filename='$DIR/$filename.sh'" >> ~/.bashrc
+            fi
+        fi
+    done
+    # for each py file in parent directory add alias if does not exist
+    for file in $DIR/*.py; do
+        if [ -f "$file" ]; then
+            # get file name without extension
+            filename=$(basename -- "$file")
+            filename="${filename%.*}"
+            # check if alias already exists
+            if ! grep -q "alias $filename=" ~/.bashrc; then
+                echo "alias $filename='$DIR/$filename.py'" >> ~/.bashrc
             fi
         fi
     done
