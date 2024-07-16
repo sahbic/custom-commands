@@ -8,7 +8,11 @@ import logging
 
 # read default value from TODO_FILE_PATH .todo_config file
 def read_config(env_variable):
-    with open(".todo_config", "r") as f:
+    # get directory of this file
+    file_dir = os.path.dirname(os.path.realpath(__file__))
+    # get the path of the .todo_config file
+    config_file_path = os.path.join(file_dir, ".todo_config")
+    with open(config_file_path, "r") as f:
         for line in f:
             key, value = line.strip().split("=")
             if key == env_variable:
