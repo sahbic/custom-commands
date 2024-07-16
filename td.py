@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import subprocess
 import sys
 import datetime
 import logging
@@ -64,6 +65,8 @@ def add_task(todo_file_path, task):
 def log_task(task):
     """Log task operations to the log file."""
     logging.info(f"Task added: {task}")
+    if is_git_repo(TODO_FILE_PATH):
+        git_commit_and_push(TODO_FILE_PATH, f"Add task: {task}")
 
 
 def mark_task_as_done(todo_file_path, task_index):
@@ -90,6 +93,8 @@ def mark_task_as_done(todo_file_path, task_index):
 def log_task_completed(task):
     """Log completed task to the log file."""
     logging.info(f"Task completed: {task}")
+    if is_git_repo(TODO_FILE_PATH):
+        git_commit_and_push(TODO_FILE_PATH, f"Task completed: {task}")
 
 
 def list_tasks(todo_file_path):
@@ -176,11 +181,47 @@ def log_move_task(source_todo_file_path, dest_todo_file_path, task):
     logging.info(
         f"Task moved: '{task}' from '{source_todo_file_path}' to '{dest_todo_file_path}'"
     )
+    if is_git_repo(TODO_FILE_PATH):
+        git_commit_and_push(
+            TODO_FILE_PATH,
+            f"Move task: '{task}' from '{source_todo_file_path}' to '{dest_todo_file_path}'",
+        )
 
 
 def log_create_todo_list(todo_file_path):
     """Log todo list creation to the log file."""
     logging.info(f"Created new todo list: '{os.path.basename(todo_file_path)}'")
+    if is_git_repo(TODO_FILE_PATH):
+        git_commit_and_push(TODO_FILE_PATH, f"Add new todo list: {todo_file_path}")
+
+
+def is_git_repo(path):
+    """Check if the given path is a Git repository."""
+    return (
+        subprocess.call(
+            ["git", "-C", path, "rev-parse"],
+            stderr=subprocess.STDOUT,
+            stdout=open(os.devnull, "w"),
+        )
+        == 0
+    )
+
+
+def git_commit_and_push(repo_path, message):
+    """Commit and push changes to the remote repository."""
+    try:
+        # add all files starting with "todo"
+        for file in os.listdir(repo_path):
+            if file.startswith("todo"):
+                subprocess.check_call(["git", "-C", repo_path, "add", file])
+        subprocess.check_call(
+            ["git", "-C", repo_path, "commit", "-m", message, "--quiet"]
+        )
+        subprocess.check_call(["git", "-C", repo_path, "pull", "--quiet"])
+        subprocess.check_call(["git", "-C", repo_path, "push", "--quiet"])
+        # print("Changes committed and pushed to remote repository.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error during git operations: {e}")
 
 
 def main():
