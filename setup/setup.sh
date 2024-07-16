@@ -51,3 +51,26 @@ if [ -f "startpy.sh" ]; then
     done
 fi
 
+CONFIG_FILE="$DIR/.todo_config"
+
+echo "Set up path for todo lists"
+
+if [ -f "$CONFIG_FILE" ]; then
+    echo "Config file already exists"
+    echo "Do you want to change the path for todo lists? (y/n)"
+    read -r response
+    if [ "$response" = "y" ]; then
+        echo "Enter the path for todo lists, current is $(grep TODO_FILE_PATH "$CONFIG_FILE" | cut -d'=' -f2)"
+        read -r path
+        echo "TODO_FILE_PATH=$path" > "$CONFIG_FILE"
+    fi
+else
+    echo "Enter the path for todo lists, default is home directory"
+    read -r path
+    if [ -z "$path" ]; then
+        path="$HOME"
+    fi
+    echo "TODO_FILE_PATH=$path" > "$CONFIG_FILE"
+fi
+
+echo "Setup complete"
