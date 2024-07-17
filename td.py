@@ -109,6 +109,10 @@ def list_tasks(todo_file_path):
     """List up to MAX_LIST_ITEMS tasks from the todo file, sorted by priority."""
     create_todo_file_if_not_exists(todo_file_path)
 
+    # Pull changes before listing tasks
+    if is_git_repo(os.path.dirname(todo_file_path)):
+        git_pull(os.path.dirname(todo_file_path))
+
     with open(todo_file_path, "r") as f:
         lines = f.readlines()
 
@@ -126,6 +130,9 @@ def list_tasks(todo_file_path):
 
 def edit_todo_file(todo_file_path):
     """Edit the todo file using the specified editor."""
+    # Pull changes before editing the todo file
+    if is_git_repo(os.path.dirname(todo_file_path)):
+        git_pull(os.path.dirname(todo_file_path))
     os.system(f"{TODO_EDITOR} {todo_file_path}")
 
 
@@ -231,6 +238,15 @@ def git_commit_and_push(repo_path, message):
         # print("Changes committed and pushed to remote repository.")
     except subprocess.CalledProcessError as e:
         print(f"Error during git operations: {e}")
+
+
+def git_pull(repo_path):
+    """Pull changes from the remote repository."""
+    try:
+        subprocess.check_call(["git", "-C", repo_path, "pull", "--quiet"])
+        # print("Changes pulled from remote repository.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error during git pull operation: {e}")
 
 
 def tag_task(todo_file_path, task_index, priority):
