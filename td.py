@@ -105,7 +105,7 @@ def log_task_completed(task):
         git_commit_and_push(TODO_FILE_PATH, f"Task completed: {task}")
 
 
-def list_tasks(todo_file_path):
+def get_tasks(todo_file_path):
     """List up to MAX_LIST_ITEMS tasks from the todo file, sorted by priority."""
     create_todo_file_if_not_exists(todo_file_path)
 
@@ -118,14 +118,16 @@ def list_tasks(todo_file_path):
 
     tasks = sorted(lines, key=lambda x: int(x.split(":")[0]))
 
+    return tasks
+
+
+def list_tasks(todo_file_path):
+    tasks = get_tasks(todo_file_path)
     num_tasks = min(len(tasks), MAX_LIST_ITEMS)
     for i in range(num_tasks):
         print(f"{i+1}: {tasks[i].strip()}")
-
     if num_tasks == 0:
         print("No tasks in To Do.")
-
-    return tasks
 
 
 def edit_todo_file(todo_file_path):
@@ -149,7 +151,7 @@ def list_all_todo_files():
             todo_file_path = os.path.join(TODO_FILE_PATH, todo_file)
             todo_name = todo_file.replace("todo_", "").replace(".md", "")
             print(f"{todo_name}:")
-            tasks = list_tasks(todo_file_path)
+            list_tasks(todo_file_path)
             print()  # Add a blank line between lists
     else:
         print("No todo lists found.")
@@ -157,8 +159,8 @@ def list_all_todo_files():
 
 def move_task(source_todo_file_path, task_index, dest_todo_file_path):
     """Move a task from one todo list to another."""
-    source_tasks = list_tasks(source_todo_file_path)
-    dest_tasks = list_tasks(dest_todo_file_path)
+    source_tasks = get_tasks(source_todo_file_path)
+    dest_tasks = get_tasks(dest_todo_file_path)
 
     if 1 <= task_index <= len(source_tasks):
         task_to_move = source_tasks[task_index - 1].strip()
@@ -251,7 +253,7 @@ def git_pull(repo_path):
 
 def tag_task(todo_file_path, task_index, priority):
     """Tag a task with a priority."""
-    tasks = list_tasks(todo_file_path)
+    tasks = get_tasks(todo_file_path)
 
     if 1 <= task_index <= len(tasks):
         tagged_task = tasks[task_index - 1].strip().split(":", 1)[1].strip()
