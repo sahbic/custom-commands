@@ -305,17 +305,11 @@ def main():
 
     if command == "add":
         if len(sys.argv) < 3:
-            print(f"Usage: td {todo_file_name} add [task]")
+            print(f"Usage: td add <priority> <task>")
             sys.exit(1)
+        priority = int(sys.argv[1]) if sys.argv[1].isdigit() else 4
         task = " ".join(sys.argv[2:])
-        add_task(todo_file_path, task)
-    if command == "add":
-        if len(sys.argv) < 4:
-            print(f"Usage: td {todo_file_name} add <priority> <task>")
-            sys.exit(1)
-        priority = int(sys.argv[2]) if sys.argv[2].isdigit() else 4
-        task = " ".join(sys.argv[3:])
-        add_task(todo_file_path, priority, task)
+        add_task(todo_file_path, task, priority)
     elif command == "edit":
         edit_todo_file(todo_file_path)
     elif command == "mark":
